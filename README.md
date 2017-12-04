@@ -19,6 +19,23 @@ prototype for collecting these errors to aid in Firefox development.
 `extensions.shield-study-js-errors@shield.mozilla.org.testing`
     If true, mark Telemetry pings sent by the client as test pings.
 
+## Development
+To build the add-on, run the `make` command:
+
+```sh
+$ make
+```
+
+This will create a `shield-study-js-errors.xpi` file in the root of the repo
+containing the add-on.
+
+To test this, you will either need to get the add-on signed by the Mozilla
+Extension key, or disable the following preferences on a copy of Firefox
+Nightly:
+
+- `xpinstall.signatures.required`
+- `extensions.allow-non-mpc-extensions`
+
 ## License
 Shield Study: JavaScript Errors is licensed under the MPLv2. See the `LICENSE`
 file for details.
