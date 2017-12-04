@@ -2,6 +2,8 @@
 A [Shield study][] to test collecting JavaScript errors thrown by Firefox
 chrome code (__not__ errors from webpages themselves).
 
+[Shield study]: https://wiki.mozilla.org/Firefox/SHIELD
+
 ## Overview
 This study listens for browser chrome errors being logged to the Browser
 Console. It then computes a hash based on the error type, name, and stack
