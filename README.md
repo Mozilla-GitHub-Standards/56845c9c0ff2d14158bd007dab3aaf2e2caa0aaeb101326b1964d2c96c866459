@@ -15,11 +15,23 @@ chrome errors in a privacy-respectful way. The data will be used to create a
 prototype for collecting these errors to aid in Firefox development.
 
 ## Preferences
-`extensions.shield-study-js-errors@shield.mozilla.org.logLevel`
-    Log level for extension logging. Defaults to Warnings an above. Set to 0 for
-    verbose logging.
-`extensions.shield-study-js-errors@shield.mozilla.org.testing`
-    If true, mark Telemetry pings sent by the client as test pings.
+<dl>
+  <dt>
+    <code>
+      extensions.shield-study-js-errors@shield.mozilla.org.logLevel
+    </code>
+  </dt>
+  <dd>
+    Log level for extension logging. Defaults to Warnings an above. Set to 0
+    for verbose logging.
+  </dd>
+  <dt>
+    <code>
+      extensions.shield-study-js-errors@shield.mozilla.org.testing
+    </code>
+  </dt>
+  <dd>If true, mark Telemetry pings sent by the client as test pings.</dd>
+</dl>
 
 ## Development
 To build the add-on, run the `make` command:
