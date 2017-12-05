@@ -28,12 +28,12 @@ function generateFingerprint(error) {
 this.install = function() {};
 
 this.startup = function() {
-  logger = Log.repository.getLogger('shield-study-js-errors');
+  logger = Log.repository.getLogger("shield-study-js-errors");
   logger.addAppender(new Log.ConsoleAppender(new Log.BasicFormatter()));
   logger.level = Services.prefs.getIntPref(
     "extensions.shield-study-js-errors@shield.mozilla.org.logLevel",
     Log.Level.Warn,
-  );;
+  );
 
   ErrorReporting.startup();
 
@@ -58,7 +58,7 @@ this.startup = function() {
       addClientId: true,
       addEnvironment: true,
     });
-  })
+  });
 };
 
 this.shutdown = function() {

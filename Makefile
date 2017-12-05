@@ -13,6 +13,9 @@ build: shield-study-js-errors.xpi
 clean:
 	rm -f shield-study-js-errors.xpi
 
+lint:
+	./node_modules/.bin/eslint extension
+
 shield-study-js-errors.xpi: $(EXTENSION_FILES)
 	pushd extension; \
 	zip -r shield-study-js-errors.xpi ./*; \
