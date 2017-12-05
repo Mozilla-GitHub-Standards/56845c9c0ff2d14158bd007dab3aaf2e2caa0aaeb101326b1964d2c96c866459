@@ -13,6 +13,9 @@ build: shield-study-js-errors.xpi
 clean:
 	rm -f shield-study-js-errors.xpi
 
+lint:
+	npm run lint
+
 shield-study-js-errors.xpi: $(EXTENSION_FILES)
 	pushd extension; \
 	zip -r shield-study-js-errors.xpi ./*; \

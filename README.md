@@ -50,6 +50,13 @@ Nightly:
 - `xpinstall.signatures.required`
 - `extensions.allow-non-mpc-extensions`
 
+Linting can be run on the add-on using `make lint`:
+
+```sh
+$ npm install # If they haven't been installed yet
+$ make lint
+```
+
 ## License
 Shield Study: JavaScript Errors is licensed under the MPLv2. See the `LICENSE`
 file for details.
