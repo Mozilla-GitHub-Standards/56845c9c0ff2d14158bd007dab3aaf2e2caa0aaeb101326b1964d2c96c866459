@@ -22,7 +22,7 @@ prototype for collecting these errors to aid in Firefox development.
     </code>
   </dt>
   <dd>
-    Log level for extension logging. Defaults to Warnings an above. Set to 0
+    Log level for extension logging. Defaults to Warnings and above. Set to 0
     for verbose logging.
   </dd>
   <dt>
