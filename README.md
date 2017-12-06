@@ -31,6 +31,15 @@ prototype for collecting these errors to aid in Firefox development.
     </code>
   </dt>
   <dd>If true, mark Telemetry pings sent by the client as test pings.</dd>
+  <dt>
+    <code>
+      extensions.shield-study-js-errors@shield.mozilla.org.submitIntervalMs
+    </code>
+  </dt>
+  <dd>
+    Interval (in milliseconds) at which to submit collected error hashes to
+    telemetry.
+  </dd>
 </dl>
 
 ## Development
