@@ -55,6 +55,8 @@ this.ErrorReporting = {
 
   submitErrors() {
     if (fingerprintsToReport.length > 0) {
+      // See https://github.com/mozilla-services/mozilla-pipeline-schemas/blob/master/schemas/telemetry/shield-study-addon/shield-study-addon.3.schema.json
+      // for schema.
       const payload = {
         version: 3,
         study_name: "shield-study-js-errors",
@@ -63,8 +65,10 @@ this.ErrorReporting = {
         shield_version: "unset",
         type: "shield-study-addon",
         data: {
-          fingerprints: fingerprintsToReport,
-          utcTimestampMs: Date.now(),
+          attributes: {
+            fingerprints: JSON.stringify(fingerprintsToReport),
+            utcTimestampMs: JSON.stringify(Date.now()),
+          },
         },
         testing: Services.prefs.getBoolPref(
           "extensions.shield-study-js-errors@shield.mozilla.org.testing",
