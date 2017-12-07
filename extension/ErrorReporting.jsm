@@ -6,83 +6,89 @@ const {utils: Cu, interfaces: Ci, classes: Cc} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Timer.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.importGlobalProperties(["TextEncoder"]);
 
-XPCOMUtils.defineLazyModuleGetter(this, "UpdateUtils", "resource://gre/modules/UpdateUtils.jsm");
-
-Cu.importGlobalProperties(["fetch", "URL"]);
+XPCOMUtils.defineLazyModuleGetter(
+  this, "TelemetryController", "resource://gre/modules/TelemetryController.jsm");
 
 this.EXPORTED_SYMBOLS = ["ErrorReporting"];
 
-const ERROR_PREFIX_RE = /^[^\W]+:/m;
-
-// https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIScriptError#Categories
-const CATEGORY_WHITELIST = [
-  "XPConnect JavaScript",
-  "component javascript",
-  "chrome javascript",
-  "chrome registration",
-  "XBL",
-  "XBL Prototype Handler",
-  "XBL Content Sink",
-  "xbl javascript",
-  "FrameConstructor",
-];
-
-const listeners = new Set();
+let fingerprintsToReport = [];
+let interval = null;
 
 this.ErrorReporting = {
   startup() {
-    Services.console.registerListener(ErrorReporting);
+    // Submit any collected errors once an hour
+    interval = setInterval(
+      this.submitErrors.bind(this),
+      Services.prefs.getIntPref(
+        "extensions.shield-study-js-errors@shield.mozilla.org.submitIntervalMs",
+        1000 * 60 * 60, // 1 hour
+      ),
+    );
   },
 
   shutdown() {
-    Services.console.unregisterListener(ErrorReporting);
+    if (interval !== null) {
+      clearInterval(interval);
+    }
+
+    // Submit any unsent intervals when the add-on or browser is shutting down
+    this.submitErrors();
   },
 
-  addListener(listener) {
-    listeners.add(listener);
+  /**
+   * Create an anonymized fingerprint of the error using the name, message, and
+   * stack trace to create a SHA384 hash.
+   * @param {Error} error
+   * @return {String}
+   */
+  generateFingerprint(error) {
+    const dataToHash = new TextEncoder().encode(
+       [error.name, error.message, error.stack].join(":"),
+     );
+     const hasher = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
+     hasher.init(hasher.SHA384);
+     hasher.update(dataToHash, dataToHash.length);
+     return hasher.finish(true).replace(/\+/g, "-").replace(/\//g, "_");
   },
 
-  removeListener(listener) {
-    listeners.delete(listener);
-  },
+  submitErrors() {
+    if (fingerprintsToReport.length > 0) {
+      // See https://github.com/mozilla-services/mozilla-pipeline-schemas/blob/master/schemas/telemetry/shield-study-addon/shield-study-addon.3.schema.json
+      // for schema.
+      const payload = {
+        version: 3,
+        study_name: "shield-study-js-errors",
+        branch: "default",
+        addon_version: "0.1.0",
+        shield_version: "unset",
+        type: "shield-study-addon",
+        data: {
+          attributes: {
+            fingerprints: JSON.stringify(fingerprintsToReport),
+            utcTimestampMs: JSON.stringify(Date.now()),
+          },
+        },
+        testing: Services.prefs.getBoolPref(
+          "extensions.shield-study-js-errors@shield.mozilla.org.testing",
+          false,
+        ),
+      };
 
-  observe(message) {
-    try {
-      message.QueryInterface(Ci.nsIScriptError);
-    } catch (err) {
-      // Not an error, which is fine.
-      return;
-    }
+      TelemetryController.submitExternalPing("shield-study-addon", payload, {
+        addClientId: true,
+        addEnvironment: true,
+      });
 
-    if (!CATEGORY_WHITELIST.includes(message.category)) {
-      return;
-    }
-
-    let errorMessage = message.errorMessage;
-    let errorName = "Error";
-    if (message.errorMessage.match(ERROR_PREFIX_RE)) {
-      const parts = message.errorMessage.split(":");
-      errorName = parts[0];
-      errorMessage = parts.slice(1).join(":");
-    }
-
-    const error = new Error(errorMessage, message.sourceName, message.lineNumber);
-    error.name = errorName;
-    if (message.stack) {
-      let stackString = "";
-      let s = message.stack;
-      while (s !== null) {
-        stackString += `${s.functionDisplayName}@${s.source}:${s.line}:${s.column}\n`;
-        s = s.parent;
-      }
-      error.stack = stackString;
-    }
-
-    for (const listener of listeners) {
-      try {
-        listener(error);
-      } catch (err) {}
+      fingerprintsToReport = [];
     }
   },
+
+  reportError(error) {
+    fingerprintsToReport.push({
+      fingerprint: this.generateFingerprint(error),
+      utcTimestampMs: Date.now(),
+    });
+  }
 };
