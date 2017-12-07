@@ -55,6 +55,55 @@ prototype for collecting these errors to aid in Firefox development.
   </dd>
 </dl>
 
+## Data Collection
+The study collects errors by listening to all messages that are being logged to
+the [Browser console][] and filtering out non-error messages. Then, it filters
+out errors with [categories that the Web console displays][categories], leaving
+only errors from the Firefox UI itself.
+
+### Telemetry Ping Example
+Once an hour, if any errors were captured, a [Telemetry][] ping is sent with
+[environmental data][] and a payload that looks like this:
+
+```json
+{
+  "version": 3,
+  "study_name": "shield-study-js-errors",
+  "branch": "default",
+  "addon_version": "0.1.0",
+  "shield_version": "unset",
+  "type": "shield-study-addon",
+  "data": {
+    "attributes": {
+      "fingerprints": "[{\"fingerprint\":\"q35iauGpeCg8FIHj4ptetoBxjIdkuyQi2InIkNpd3AYLwSH7RS44By4CbrPVH0yA\",\"utcTimestampMs\":1512683455924}]",
+      "utcTimestampMs": "1512683575918"
+    }
+  },
+  "testing": false
+}
+```
+
+The study specific fields are:
+
+<dl>
+  <dt><code>data.attributes.fingerprints</code></dt>
+  <dd>
+    A JSON string encoding a list of objects. Each object has a fingerprint,
+    which is a SHA384 hash of the an error type, message, and stacktrace, and a
+    timestamp indicating when the error occurred.
+  </dd>
+  <dt><code>data.attributes.utcTimestampMs</code></dt>
+  <dd>
+    A timestamp indicating when the ping was sent. This is used to deal with
+    inaccurate local time on the client.
+  </dd>
+</dl>
+
+[Browser console]: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
+[categories]: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIScriptError#Categories
+[Telemetry]: https://wiki.mozilla.org/Telemetry
+[environmental data]: http://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/data/environment.html
+
 ## Development
 To build the add-on, run the `make` command:
 
