@@ -14,6 +14,10 @@ The purpose of the study is to measure the amount and distribution of browser
 chrome errors in a privacy-respectful way. The data will be used to create a
 prototype for collecting these errors to aid in Firefox development.
 
+## Dashboards
+
+- [Number of study pings received per-minute](https://pipeline-cep.prod.mozaws.net/dashboard_output/graphs/analysis.mkelly_mozilla_com.shield_study_js_errors_pings_received.JS_error_study_pings_per_minute.html)
+
 ## Preferences
 <dl>
   <dt>
