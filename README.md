@@ -18,15 +18,6 @@ prototype for collecting these errors to aid in Firefox development.
 <dl>
   <dt>
     <code>
-      extensions.shield-study-js-errors@shield.mozilla.org.logLevel
-    </code>
-  </dt>
-  <dd>
-    Log level for extension logging. Defaults to Warnings and above. Set to 0
-    for verbose logging.
-  </dd>
-  <dt>
-    <code>
       extensions.shield-study-js-errors@shield.mozilla.org.testing
     </code>
   </dt>
@@ -39,6 +30,24 @@ prototype for collecting these errors to aid in Firefox development.
   <dd>
     Interval (in milliseconds) at which to submit collected error hashes to
     telemetry.
+  </dd>
+  <dt>
+    <code>
+      extensions.shield-study-js-errors@shield.mozilla.org.expirationDate
+    </code>
+  </dt>
+  <dd>
+    Date.parse-compatible string specifying the datetime that the experiment
+    should expire and automatically uninstall itself. Defaults to January 1st,
+    2018.
+  </dd>
+  <dt>
+    <code>
+      extensions.shield-study-js-errors@shield.mozilla.org.expirationIntervalMs
+    </code>
+  </dt>
+  <dd>
+    Interval (in milliseconds) at which to check whether the study has expired or not. Defaults to once per day.
   </dd>
 </dl>
 
